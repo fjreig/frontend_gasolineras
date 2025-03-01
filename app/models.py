@@ -15,7 +15,6 @@ def obtener_skip_equipos(num_pagina):
 
 def get_all_tasks(num_pagina):
     (offset_equipos, limit_elementos) = obtener_skip_equipos(num_pagina)
-    print(offset_equipos, limit_elementos)
     cursor = db.gasolineras.find(
         filter={'Precio Gasoleo A': {'$gt': 0}},
         projection={},
@@ -41,6 +40,15 @@ def filter_by_municipio(Municipio, num_pagina):
     num = db.gasolineras.count_documents({"Localidad":{"$regex": Municipio}})
     valores = list(cursor)
     return(num, valores)
+
+def filter_by_id(id):
+    cursor = db.gasolineras.find(
+        filter={'IDEESS': id},
+        projection={},
+        collation={},
+        )
+    valores = list(cursor)
+    return(valores)
 
 def BuscarProvincias():
     cursor = db.gasolineras.distinct('Provincia')

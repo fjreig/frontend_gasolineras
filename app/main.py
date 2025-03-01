@@ -4,7 +4,7 @@ from fasthtml.common import *
 from monsterui.all import *
 from datetime import datetime
 
-from app.models import add_gasolineras, get_all_tasks, filter_by_municipio
+from app.models import add_gasolineras, get_all_tasks, filter_by_municipio, filter_by_id
 from app.lista import consultar_datos
 from app.gasolineras import ObtenerPrecio
 
@@ -32,6 +32,13 @@ def index():
     else:
         (num_filas, data) = filter_by_municipio(current_municipio, current_page)
     return consultar_datos(num_filas, data, current_page)
+
+@rt('/informacion/{valor}')
+def index(valor):
+    return Title("Count Demo"), Main(
+        H1("Count Demo"),
+        P(valor, id="count"),
+    )
 
 @app.post('/filtrar_municipio')
 def post(FiltroMunicipio:str):
@@ -61,6 +68,11 @@ def post():
     else:
         current_page=0
     return Redirect(f"/")
+
+@rt('/info/{gasolinera}')
+def info_gasolinera(gasolinera):
+    valor = filter_by_id(gasolinera)
+    return Redirect(f"/informacion/{valor}")
 
 @rt('/gasolineras')
 def post():
