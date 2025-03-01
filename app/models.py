@@ -1,0 +1,79 @@
+from datetime import datetime
+from fasthtml.common import *
+from bson.objectid import ObjectId
+import os
+
+from app.database import db
+
+def obtener_skip_equipos(num_pagina):
+    num_ros_pagina = int(os.environ['Num_equipos_por_pagina'])
+    if num_pagina == 0:
+        offset_equipos = 0
+    else:
+        offset_equipos = (num_pagina * num_ros_pagina)
+    return(offset_equipos, num_ros_pagina)
+
+def get_all_tasks(num_pagina):
+    (offset_equipos, limit_elementos) = obtener_skip_equipos(num_pagina)
+    print(offset_equipos, limit_elementos)
+    cursor = db.gasolineras.find(
+        filter={},
+        projection={},
+        sort=list({ 'Precio Gasoleo A': -1}.items()),
+        collation={},
+        skip=offset_equipos,
+        limit=limit_elementos
+        )
+    num = db.gasolineras.count_documents({})
+    valores = list(cursor)
+    return(num, valores)
+
+def filter_by_localidad(Localidad, num_pagina):
+    (offset_equipos, limit_elementos) = obtener_skip_equipos(num_pagina)
+    cursor = db.gasolineras.find(
+        filter={'Localidad': {'$regex': Localidad}},
+        projection={},
+        sort=list({ 'Precio Gasoleo A': -1}.items()),
+        collation={},
+        skip=offset_equipos,
+        limit=limit_elementos
+        )
+    num = db.gasolineras.count_documents({"Localidad":{"$regex": Localidad}})
+    valores = list(cursor)
+    return(num, valores)
+
+def BuscarProvincias():
+    cursor = db.gasolineras.distinct('Provincia')
+    valores = list(cursor)
+    return(valores)
+
+def BuscarLocalidad():
+    cursor = db.gasolineras.distinct('Localidad')
+    valores = list(cursor)
+    return(valores)
+
+def BuscarRotulos():
+    cursor = db.gasolineras.distinct('Rótulo')
+    valores = list(cursor)
+    return(valores)
+
+def new_task(valores):
+    valores.update({'fecha_creacion': datetime.now(), 'fecha_actualizacion': datetime.now()})
+    db.gasolineras.insert_one(valores).inserted_id
+
+def update_task(valores):
+    a=1
+
+def delete_task(id):
+    db.gasolineras.delete_one({'_id': ObjectId(id)})
+
+def copy_task(id):
+    obj = db.gasolineras.find({'_id': ObjectId(id)})
+    valores = list(obj)
+    valores = valores[0]
+    del valores['_id']
+    valores.update({'fecha_creacion': datetime.now(), 'fecha_actualizacion': datetime.now()})
+    db.gasolineras.insert_one(valores).inserted_id
+
+def add_gasolineras(valores):
+    db.gasolineras.insert_many(valores)
