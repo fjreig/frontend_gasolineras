@@ -4,7 +4,7 @@ from fasthtml.common import *
 from monsterui.all import *
 from datetime import datetime
 
-from app.models import add_gasolineras, get_all_tasks, filter_by_localidad
+from app.models import add_gasolineras, get_all_tasks, filter_by_municipio
 from app.lista import consultar_datos
 from app.gasolineras import ObtenerPrecio
 
@@ -21,24 +21,24 @@ class New_Element:
     habilitado: bool
 
 current_page = 0
-current_localidad = "" 
+current_municipio = "" 
 
 @rt('/')
 def index():
     global current_page
-    global current_localidad
-    if current_localidad == "":
+    global current_municipio
+    if current_municipio == "":
         (num_filas, data) = get_all_tasks(current_page)
     else:
-        (num_filas, data) = filter_by_localidad(current_localidad, current_page)
+        (num_filas, data) = filter_by_municipio(current_municipio, current_page)
     return consultar_datos(num_filas, data, current_page)
 
-@app.post('/filtrar_localidad')
-def post(FiltroLocalidad:str):
-    global current_localidad
+@app.post('/filtrar_municipio')
+def post(FiltroMunicipio:str):
+    global current_municipio
     global current_page
     current_page = 0
-    current_localidad = FiltroLocalidad
+    current_municipio = FiltroMunicipio
     return Redirect(f"/")
 
 @app.post('/first_page')

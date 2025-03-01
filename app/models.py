@@ -17,9 +17,9 @@ def get_all_tasks(num_pagina):
     (offset_equipos, limit_elementos) = obtener_skip_equipos(num_pagina)
     print(offset_equipos, limit_elementos)
     cursor = db.gasolineras.find(
-        filter={},
+        filter={'Precio Gasoleo A': {'$gt': 0}},
         projection={},
-        sort=list({ 'Precio Gasoleo A': -1}.items()),
+        sort=list({'Precio Gasoleo A': 1}.items()),
         collation={},
         skip=offset_equipos,
         limit=limit_elementos
@@ -28,17 +28,17 @@ def get_all_tasks(num_pagina):
     valores = list(cursor)
     return(num, valores)
 
-def filter_by_localidad(Localidad, num_pagina):
+def filter_by_municipio(Municipio, num_pagina):
     (offset_equipos, limit_elementos) = obtener_skip_equipos(num_pagina)
     cursor = db.gasolineras.find(
-        filter={'Localidad': {'$regex': Localidad}},
+        filter={'Municipio': {'$regex': Municipio}, 'Precio Gasoleo A': {'$gt': 0}},
         projection={},
-        sort=list({ 'Precio Gasoleo A': -1}.items()),
+        sort=list({'Precio Gasoleo A': 1}.items()),
         collation={},
         skip=offset_equipos,
         limit=limit_elementos
         )
-    num = db.gasolineras.count_documents({"Localidad":{"$regex": Localidad}})
+    num = db.gasolineras.count_documents({"Localidad":{"$regex": Municipio}})
     valores = list(cursor)
     return(num, valores)
 
@@ -47,8 +47,8 @@ def BuscarProvincias():
     valores = list(cursor)
     return(valores)
 
-def BuscarLocalidad():
-    cursor = db.gasolineras.distinct('Localidad')
+def BuscarMunicipio():
+    cursor = db.gasolineras.distinct('Municipio')
     valores = list(cursor)
     return(valores)
 

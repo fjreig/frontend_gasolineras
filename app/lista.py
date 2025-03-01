@@ -7,13 +7,15 @@ import os
 
 from app.models import (
     get_all_tasks,
-    BuscarLocalidad,
+    BuscarMunicipio,
     BuscarProvincias,
     BuscarRotulos
 )
 
+valor_id = 1
+
 Listado_Provincias = BuscarProvincias()
-Listado_Localidades = BuscarLocalidad()
+Listado_Municipio = BuscarMunicipio()
 Listado_Rotulos = BuscarRotulos()
 
 app, rt = fast_app(hdrs=Theme.blue.headers())
@@ -22,8 +24,9 @@ def LAlignedCheckTxt(txt):
     return DivLAligned(UkIcon(icon='check'), P(txt, cls=TextPresets.muted_sm))
 
 def _create_tbl_data(d):
-    return {'ID': d['_id'], 'Municipio': d['Municipio'], 'Provincia': d['Provincia'], 'Localidad': d['Localidad'],
-            'Latitud': d['Latitud'], 'Longitud': d['Longitud (WGS84)'] , 'GasoleoA': d['Precio Gasoleo A'],
+    return {'ID': d['IDEESS'],'Municipio': d['Municipio'], 'Provincia': d['Provincia'],
+            'Latitud': d['Latitud'], 'Longitud': d['Longitud (WGS84)'] , 
+            'GasoleoA': d['Precio Gasoleo A'], 'Gasolina95E5': d['Precio Gasolina 95 E5'],
             'Rotulo':  d['Rótulo']}
 
 def CreateTaskModal():
@@ -33,7 +36,7 @@ def CreateTaskModal():
             Br(),
             Form(cls='space-y-6')(
                 Grid(Div(Select(*map(Option, Listado_Provincias), label='Provincias', id='Provincias', name='Provincias')),
-                     Div(Select(*map(Option, Listado_Localidades), label='Localidades', id='Localidades', name='Localidades')),
+                     Div(Select(*map(Option, Listado_Municipio), label='Municipio', id='Municipio', name='Municipio')),
                      Div(Select(*map(Option, Listado_Rotulos), label='Rotulos', id='Rotulos', name='Rotulos')),
                 ),
                 DivRAligned(
@@ -43,20 +46,25 @@ def CreateTaskModal():
                     cls='space-x-5'))),
         id='FiltroForm')
 
+def acciones_row(valor_id):
+    return Div(DivLAligned(
+                UkIconLink(icon='info', button=True, hx_get=f"/info/{valor_id}"),
+                UkIconLink(icon='map', button=True, hx_get=f"/map/{valor_id}"), 
+                UkIconLink(icon='chart-spline', button=True, hx_get=f"/historico/{valor_id}"),
+            )
+        )
 
 def cell_render(col, val):
     global valor_id
     def _Td(*args,cls='', **kwargs): 
         return Td(*args, cls=f'p-2 {cls}',**kwargs)
     match col:
-        case "ID": 
+        case "ID":
             valor_id = val
             return _Td(val, cls='uk-visible@s')
         case "Provincia": 
             return _Td(val, cls='uk-visible@s')
         case "Municipio": 
-            return _Td(val, cls='uk-visible@s')
-        case "Localidad":  
             return _Td(val, cls='uk-visible@s')
         case "Latitud": 
             return _Td(val, cls='font-medium')
@@ -66,8 +74,10 @@ def cell_render(col, val):
             return _Td(val, cls='font-medium')
         case "GasoleoA": 
             return _Td(val, cls='font-medium')
+        case "Gasolina95E5": 
+            return _Td(val, cls='font-medium')
         case "Actions": 
-            return _Td(inventario_edit(valor_id), shrink=True)
+            return _Td(acciones_row(valor_id), shrink=True)
         case _: raise ValueError(f"Unknown column: {col}")
 
 def footer(num_row, current_page, total_pages):
@@ -104,15 +114,15 @@ def consultar_datos(num_row, data, current_page: int):
     table_controls =(
         DivLAligned(
             Form(DivLAligned(
-                Input(cls='w-[250px]',placeholder='Filtro por localidad',name='FiltroLocalidad'),
-                Button("Buscar",cls=(ButtonT.primary, TextPresets.bold_sm), hx_post="/filtrar_localidad")
+                Input(cls='w-[250px]',placeholder='Filtro por Municipio',name='FiltroMunicipio'),
+                Button("Buscar",cls=(ButtonT.primary, TextPresets.bold_sm), hx_post="/filtrar_municipio")
             )),
             Button('Filtro',cls=(ButtonT.primary, TextPresets.bold_sm), data_uk_toggle="target: #FiltroForm"),
-            Button('Gasolineras',cls=(ButtonT.primary, TextPresets.bold_sm), hx_post="/gasolineras")
+            Button('Download',cls=(ButtonT.primary, TextPresets.bold_sm), hx_post="/gasolineras")
             )
         )
 
-    task_columns = ["ID", "Provincia", "Municipio", "Localidad", 'Latitud', 'Longitud', 'GasoleoA', 'Rotulo']
+    task_columns = ["ID", "Provincia", "Municipio", 'Latitud', 'Longitud', 'GasoleoA', 'Gasolina95E5', 'Rotulo', 'Actions']
 
     tasks_table = Div(cls='mt-4')(
         TableFromDicts(
