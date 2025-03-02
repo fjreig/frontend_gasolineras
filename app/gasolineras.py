@@ -31,6 +31,10 @@ def ObtenerPrecio():
     df2['Precio Gasolina 98 E10'] = pd.to_numeric(df2['Precio Gasolina 98 E10'].str.replace(',','.'))
     df2['Precio Gasolina 98 E5'] = pd.to_numeric(df2['Precio Gasolina 98 E5'].str.replace(',','.'))
     df2['Precio Hidrogeno'] = pd.to_numeric(df2['Precio Hidrogeno'].str.replace(',','.'))
+    df2['Precio Biodiesel'] = pd.to_numeric(df2['Precio Biodiesel'].str.replace(',','.'))
+    df2['Precio Bioetanol'] = pd.to_numeric(df2['Precio Bioetanol'].str.replace(',','.'))
+    df2['Precio Gas Natural Licuado'] = pd.to_numeric(df2['Precio Gas Natural Licuado'].str.replace(',','.'))
+    df2['Precio Gas Natural Comprimido'] = pd.to_numeric(df2['Precio Gas Natural Comprimido'].str.replace(',','.'))
 
     valores = df2.to_dict('records')
     return(valores)

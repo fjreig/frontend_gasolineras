@@ -3,7 +3,6 @@ from fasthtml.components import Uk_input_tag
 from fasthtml.svg import *
 from monsterui.all import *
 import plotly.express as px
-from fh_plotly import plotly2fasthtml
 from datetime import datetime
 import pandas as pd
 
@@ -35,7 +34,7 @@ def Info_precios_carburante(valor_info):
         DivLAligned(
             LabelInput(label='Hidrogeno', id='subject', value=valor_info['Precio Hidrogeno'], readonly=True),
         ),
-        header=(H3('Listado de Precios'),Subtitle('Precios de los diferente carburantes de esta gasolinera')),
+        header=(H3('Listado de Precios'),Subtitle('Precios de la ultima fecha almacenada en la BBDD')),
         )
     )
 
@@ -52,23 +51,31 @@ def generarGrafica(valor_info):
     df = df.transpose()
     fig = px.scatter_map(df, lat="Latitud", lon="Longitud (WGS84)",
                     color_continuous_scale=px.colors.cyclical.IceFire, size_max=15, zoom=10)
-    return plotly2fasthtml(fig)
+    fig.update_layout(
+        margin=dict(l=20, r=20, t=20, b=20), hovermode='x unified',
+        showlegend=True, legend=dict(orientation='h', yanchor='bottom', y=1.02,  xanchor='right', x=1),
+        plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+        xaxis=dict(showline=True, linewidth=1, linecolor='white', gridcolor='rgba(0,0,0,0)'),
+        yaxis=dict(showline=True, linewidth=1, linecolor='white', gridcolor='rgba(0,0,0,0)'))
+    fig.update_layout(xaxis_title="Fecha", yaxis_title="Intensidad [A]")
+    fig.update_yaxes(title_font_color="white", color="white", rangemode="tozero")
+    fig.update_xaxes(title_font_color="white", color="white")
+    return fig.to_html(include_plotlyjs=True, full_html=False, config={'displayModeBar': False})
 
 def Info_map(valor_info):
-    generarGrafica(valor_info)
-    return(Card(H4("Horario"),
-                Subtitle(f"Mapa"),
-                generarGrafica(valor_info)
-        )
+    return(Card(H4("Mapa"),
+            Grid(
+                Card(Safe(generarGrafica(valor_info)), cls='col-span-2'),
+            ) )
     )
 
 def Info_ubicacion_Gasolinera(valor_info):
     valores =(
-        ('bell', "Provincia", valor_info['Provincia']), 
-        ('user', "Municipio", valor_info['Municipio']),
-        ('ban', "Localidad", valor_info['Localidad']),
-        ('ban', "Dirección", valor_info['Dirección']),
-        ('ban', "Código Postal", valor_info['C.P.'])
+        ('map-pinned', "Provincia", valor_info['Provincia']), 
+        ('building-2', "Municipio", valor_info['Municipio']),
+        ('pin', "Localidad", valor_info['Localidad']),
+        ('locate-fixed', "Dirección", valor_info['Dirección']),
+        ('mail', "Código Postal", valor_info['C.P.'])
     )
     return(
         Card(
@@ -81,9 +88,9 @@ def Info_ubicacion_Gasolinera(valor_info):
 
 def Info_ubicacion_Gasolinera_Codigos(valor_info):
     valores =(
-        ('bell', "Provincia", valor_info['IDProvincia']), 
-        ('user', "Municipio", valor_info['IDMunicipio']),
-        ('ban', "IDCCAA", valor_info['IDCCAA']),
+        ('map-pinned', "Provincia", valor_info['IDProvincia']), 
+        ('map-pinned', "Municipio", valor_info['IDMunicipio']),
+        ('map-pinned', "IDCCAA", valor_info['IDCCAA']),
     )
     return(
         Card(

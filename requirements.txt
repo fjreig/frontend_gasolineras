@@ -7,4 +7,5 @@ pandas
 MonsterUI
 pymongo
 plotly
-fh-plotly
+altair
+fh_altair

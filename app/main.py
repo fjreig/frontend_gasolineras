@@ -3,6 +3,7 @@ from pathlib import Path
 from fasthtml.common import *
 from monsterui.all import *
 from datetime import datetime
+from fh_altair import altair_headers
 
 from app.models import add_gasolineras, get_all_tasks, filter_by_municipio, filter_by_id
 from app.lista import consultar_datos
@@ -16,7 +17,7 @@ from app.info import (
     Info_map
 )
 
-hdrs = (Theme.green.headers())
+hdrs = (Theme.green.headers(), altair_headers)
 app, rt = fast_app(hdrs=hdrs)
 
 @dataclass
@@ -44,16 +45,15 @@ def index():
 @rt('/informacion/{id}')
 def index(id: str):
     df_gasolinerra = filter_by_id(id)
-    print(df_gasolinerra)
     return Title("Info Gasolinera"),Container(
         H2(f'Información gasolinera {id}'),
         DivRAligned(
                 Button("Volver", cls=ButtonT.destructive, hx_post="/return",),
             ),
         Grid(*map(Div,(
-                      Div(Info_ubicacion_Gasolinera(df_gasolinerra), Info_ubicacion_Gasolinera_Codigos(df_gasolinerra), cls='space-y-4'),
-                      Div(Info_precios_carburante(df_gasolinerra), cls='space-y-4'),
-                      Div(Info_Horario(df_gasolinerra), Info_map(df_gasolinerra), cls='space-y-4'))),
+            Div(Info_ubicacion_Gasolinera(df_gasolinerra), Info_ubicacion_Gasolinera_Codigos(df_gasolinerra), cls='space-y-4'),
+            Div(Info_precios_carburante(df_gasolinerra), cls='space-y-4'),
+            Div(Info_Horario(df_gasolinerra), Info_map(df_gasolinerra), cls='space-y-4'))),
          cols_md=1, cols_lg=2, cols_xl=3))
 
 @rt('/graficas/{id}')
@@ -63,8 +63,8 @@ def index(id: str):
     return Title("Historicos"), Container(
         H2('Graficos'),
         DivRAligned(
-                Button("Refrescar", cls=ButtonT.primary, hx_post="/graficas",),
-                Button("Volver", cls=ButtonT.destructive, hx_post="/return",),
+            Button("Refrescar", cls=ButtonT.primary, hx_post="/graficas",),
+            Button("Volver", cls=ButtonT.destructive, hx_post="/return",),
             ),
         #Generar_Cards(df_inversor),
         Grid(
