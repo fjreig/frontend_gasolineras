@@ -14,7 +14,8 @@ from app.info import (
     Info_precios_carburante, 
     Info_Horario, 
     Info_ubicacion_Gasolinera_Codigos,
-    Info_map
+    Info_map,
+    Info_Rotulo
 )
 
 hdrs = (Theme.green.headers(), altair_headers)
@@ -50,10 +51,11 @@ def index(id: str):
         DivRAligned(
                 Button("Volver", cls=ButtonT.destructive, hx_post="/return",),
             ),
+        Div(),
         Grid(*map(Div,(
             Div(Info_ubicacion_Gasolinera(df_gasolinerra), Info_ubicacion_Gasolinera_Codigos(df_gasolinerra), cls='space-y-4'),
-            Div(Info_precios_carburante(df_gasolinerra), cls='space-y-4'),
-            Div(Info_Horario(df_gasolinerra), Info_map(df_gasolinerra), cls='space-y-4'))),
+            Div(Info_Horario(df_gasolinerra), Info_precios_carburante(df_gasolinerra), cls='space-y-4'),
+            Div(Info_Rotulo(df_gasolinerra), Info_map(df_gasolinerra), cls='space-y-4'))),
          cols_md=1, cols_lg=2, cols_xl=3))
 
 @rt('/graficas/{id}')

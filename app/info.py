@@ -100,3 +100,18 @@ def Info_ubicacion_Gasolinera_Codigos(valor_info):
             header = (H4('Ubicación'),Subtitle('Códigos')),
             body_cls='pt-0')
     )
+
+def Info_Rotulo(valor_info):
+    valores =(
+        ('map-pinned', "Rótulo", valor_info['Rótulo']), 
+        ('map-pinned', "Tipo Venta", valor_info['Tipo Venta']),
+        ('map-pinned', "Margen", valor_info['Margen']),
+    )
+    return(
+        Card(
+            NavContainer(
+                *[NotificationRow(*row) for row in valores],
+                cls=NavT.secondary),
+            header = (H4('Ubicación'),Subtitle('Códigos')),
+            body_cls='pt-0')
+    )
