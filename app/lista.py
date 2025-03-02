@@ -13,6 +13,7 @@ from app.models import (
 )
 
 valor_id = 1
+valor_municipio = ""
 
 Listado_Provincias = BuscarProvincias()
 Listado_Municipio = BuscarMunicipio()
@@ -46,16 +47,17 @@ def CreateTaskModal():
                     cls='space-x-5'))),
         id='FiltroForm')
 
-def acciones_row(valor_id):
+def acciones_row(valor_id, valor_municipio):
     return Div(DivLAligned(
                 UkIconLink(icon='info', button=True, hx_get=f"/info/{valor_id}"),
-                UkIconLink(icon='map', button=True, hx_get=f"/map/{valor_id}"), 
+                UkIconLink(icon='map', button=True, hx_get=f"/map/{valor_municipio}"), 
                 UkIconLink(icon='chart-spline', button=True, hx_get=f"/charts/{valor_id}"),
             )
         )
 
 def cell_render(col, val):
     global valor_id
+    global valor_municipio
     def _Td(*args,cls='', **kwargs): 
         return Td(*args, cls=f'p-2 {cls}',**kwargs)
     match col:
@@ -65,6 +67,7 @@ def cell_render(col, val):
         case "Provincia": 
             return _Td(val, cls='uk-visible@s')
         case "Municipio": 
+            valor_municipio = val
             return _Td(val, cls='uk-visible@s')
         case "Latitud": 
             return _Td(val, cls='font-medium')
@@ -77,7 +80,7 @@ def cell_render(col, val):
         case "Gasolina95E5": 
             return _Td(val, cls='font-medium')
         case "Actions": 
-            return _Td(acciones_row(valor_id), shrink=True)
+            return _Td(acciones_row(valor_id, valor_municipio), shrink=True)
         case _: raise ValueError(f"Unknown column: {col}")
 
 def footer(num_row, current_page, total_pages):

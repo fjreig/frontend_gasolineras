@@ -61,6 +61,15 @@ def filter_by_id(id):
     valores = list(cursor)
     return(valores)
 
+def filter_by_municipio_all(Municipio):
+    cursor = db.gasolineras.find(
+        filter={'Municipio': Municipio},
+        projection={},
+        collation={},
+        )
+    valores = list(cursor)
+    return(valores)
+
 def BuscarProvincias():
     cursor = db.gasolineras.distinct('Provincia')
     valores = list(cursor)

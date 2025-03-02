@@ -4,8 +4,9 @@ from fasthtml.common import *
 from monsterui.all import *
 from datetime import datetime
 from fh_altair import altair_headers
+import pandas as pd
 
-from app.models import add_gasolineras, get_all_tasks, filter_by_municipio, filter_by_id, filter_by_id_info
+from app.models import add_gasolineras, get_all_tasks, filter_by_municipio, filter_by_id, filter_by_id_info, filter_by_municipio_all
 from app.lista import consultar_datos
 from app.gasolineras import ObtenerPrecio
 from app.dashboard import generate_chart_Gasoil, generate_chart_Gasolina95
@@ -16,6 +17,12 @@ from app.info import (
     Info_ubicacion_Gasolinera_Codigos,
     Info_map,
     Info_Rotulo
+)
+
+from app.info_Municipio import (
+    generarGrafica_MAP_Gasoil,
+    generarGrafica_MAP_Gasolina,
+    generarGrafica_Gasolina
 )
 
 hdrs = (Theme.green.headers(), altair_headers)
@@ -64,14 +71,29 @@ def index(id: str):
     return Title("Historicos"), Container(
         H2('Graficos'),
         DivRAligned(
-            Button("Refrescar", cls=ButtonT.primary, hx_post="/graficas",),
-            Button("Volver", cls=ButtonT.destructive, hx_post="/return",),
-            ),
-        #Generar_Cards(df_inversor),
+            Button("Volver", cls=ButtonT.destructive, hx_post="/return"),
+        ),
         Grid(
-            Card(Safe(generate_chart_Gasoil(df_gasolinerra)), cls='col-span-2'),
-            Card(Safe(generate_chart_Gasolina95(df_gasolinerra)), cls='col-span-2'),
-            gap=2,cols_xl=7,cols_lg=7,cols_md=1,cols_sm=1,cols_xs=1),
+            Card(Safe(generate_chart_Gasoil(df_gasolinerra)), cls='col-span-3'),
+            Card(Safe(generate_chart_Gasolina95(df_gasolinerra)), cls='col-span-3'),
+            gap=2, cols_xl=6, cols_lg=6, cols_md=1, cols_sm=1, cols_xs=1),
+        cls=('space-y-4', ContainerT.xl)
+        )
+
+@rt('/info_municipio/{municipio}')
+def index(municipio: str):
+    df_gasolinera = filter_by_municipio_all(municipio)
+    df_gasolinera = pd.DataFrame.from_records(df_gasolinera)
+    return Title("Info Municipio"), Container(
+        H2(f'Info por Municipio {municipio}'),
+        DivRAligned(
+            Button("Volver", cls=ButtonT.destructive, hx_post="/return"),
+        ),
+        Grid(
+            Card(Safe(generarGrafica_MAP_Gasoil(df_gasolinera)), cls='col-span-3'),
+            Card(Safe(generarGrafica_MAP_Gasolina(df_gasolinera)), cls='col-span-3'),
+            Card(Safe(generarGrafica_Gasolina(df_gasolinera)), cls='col-span-3'),
+            gap=2, cols_xl=6, cols_lg=6, cols_md=1, cols_sm=1, cols_xs=1),
         cls=('space-y-4', ContainerT.xl)
         )
 
@@ -115,6 +137,10 @@ def info_gasolinera(gasolinera: str):
     valor = filter_by_id_info(gasolinera)
     gasolinera_info = valor['IDEESS']
     return Redirect(f"/graficas/{gasolinera_info}")
+
+@rt('/map/{municipio}')
+def info_gasolinera(municipio: str):
+    return Redirect(f"/info_municipio/{municipio}")
 
 @rt('/return')
 def info_gasolinera():
