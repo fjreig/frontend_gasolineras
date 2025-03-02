@@ -26,7 +26,6 @@ def LAlignedCheckTxt(txt):
 
 def _create_tbl_data(d):
     return {'ID': d['IDEESS'],'Municipio': d['Municipio'], 'Provincia': d['Provincia'],
-            'Latitud': d['Latitud'], 'Longitud': d['Longitud (WGS84)'] , 
             'GasoleoA': d['Precio Gasoleo A'], 'Gasolina95E5': d['Precio Gasolina 95 E5'],
             'Rotulo':  d['Rótulo']}
 
@@ -69,10 +68,6 @@ def cell_render(col, val):
         case "Municipio": 
             valor_municipio = val
             return _Td(val, cls='uk-visible@s')
-        case "Latitud": 
-            return _Td(val, cls='font-medium')
-        case "Longitud": 
-            return _Td(val, cls='font-medium')
         case "Rotulo": 
             return _Td(val, cls='font-medium')
         case "GasoleoA": 
@@ -125,7 +120,7 @@ def consultar_datos(num_row, data, current_page: int):
             )
         )
 
-    task_columns = ["ID", "Provincia", "Municipio", 'Latitud', 'Longitud', 'GasoleoA', 'Gasolina95E5', 'Rotulo', 'Actions']
+    task_columns = ["ID", "Provincia", "Municipio", 'GasoleoA', 'Gasolina95E5', 'Rotulo', 'Actions']
 
     tasks_table = Div(cls='mt-4')(
         TableFromDicts(
