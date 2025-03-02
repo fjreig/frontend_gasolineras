@@ -5,7 +5,7 @@ from monsterui.all import *
 from datetime import datetime
 from fh_altair import altair_headers
 
-from app.models import add_gasolineras, get_all_tasks, filter_by_municipio, filter_by_id
+from app.models import add_gasolineras, get_all_tasks, filter_by_municipio, filter_by_id, filter_by_id_info
 from app.lista import consultar_datos
 from app.gasolineras import ObtenerPrecio
 from app.dashboard import generate_chart_Gasoil, generate_chart_Gasolina95
@@ -45,23 +45,22 @@ def index():
 
 @rt('/informacion/{id}')
 def index(id: str):
-    df_gasolinerra = filter_by_id(id)
-    return Title("Info Gasolinera"),Container(
-        H2(f'Información gasolinera {id}'),
+    df_gasolinerra = filter_by_id_info(id)
+    return Title("Info Gasolinera"), Container(
+        H2(f'Info Gasolinera {id}'),
         DivRAligned(
-                Button("Volver", cls=ButtonT.destructive, hx_post="/return",),
-            ),
-        Div(),
+            Button("Volver", cls=ButtonT.destructive, hx_post="/return"),
+        ),
         Grid(*map(Div,(
             Div(Info_ubicacion_Gasolinera(df_gasolinerra), Info_ubicacion_Gasolinera_Codigos(df_gasolinerra), cls='space-y-4'),
             Div(Info_Horario(df_gasolinerra), Info_precios_carburante(df_gasolinerra), cls='space-y-4'),
             Div(Info_Rotulo(df_gasolinerra), Info_map(df_gasolinerra), cls='space-y-4'))),
-         cols_md=1, cols_lg=2, cols_xl=3))
+         cols_md=1, cols_lg=2, cols_xl=3),
+        cls=('space-y-4', ContainerT.xl))
 
 @rt('/graficas/{id}')
 def index(id: str):
     df_gasolinerra = filter_by_id(id)
-    print(df_gasolinerra)
     return Title("Historicos"), Container(
         H2('Graficos'),
         DivRAligned(
@@ -107,13 +106,13 @@ def post():
 
 @rt('/info/{gasolinera}')
 def info_gasolinera(gasolinera: str):
-    valor = filter_by_id(gasolinera)
+    valor = filter_by_id_info(gasolinera)
     gasolinera_info = valor['IDEESS']
     return Redirect(f"/informacion/{gasolinera_info}")
 
 @rt('/charts/{gasolinera}')
 def info_gasolinera(gasolinera: str):
-    valor = filter_by_id(gasolinera)
+    valor = filter_by_id_info(gasolinera)
     gasolinera_info = valor['IDEESS']
     return Redirect(f"/graficas/{gasolinera_info}")
 
