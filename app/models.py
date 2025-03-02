@@ -1,9 +1,12 @@
 from datetime import datetime
 from fasthtml.common import *
 from bson.objectid import ObjectId
+import math
 import os
 
 from app.database import db
+
+last_page = 0
 
 def obtener_skip_equipos(num_pagina):
     num_ros_pagina = int(os.environ['Num_equipos_por_pagina'])
@@ -24,6 +27,8 @@ def get_all_tasks(num_pagina):
         limit=limit_elementos
         )
     num = db.gasolineras.count_documents({})
+    global last_page
+    last_page = math.ceil(num / int(os.environ['Num_equipos_por_pagina']))-1
     valores = list(cursor)
     return(num, valores)
 
@@ -38,8 +43,14 @@ def filter_by_municipio(Municipio, num_pagina):
         limit=limit_elementos
         )
     num = db.gasolineras.count_documents({"Localidad":{"$regex": Municipio}})
+    global last_page
+    last_page = math.ceil(num / int(os.environ['Num_equipos_por_pagina']))-1
     valores = list(cursor)
     return(num, valores)
+
+def get_last_page():
+    global last_page
+    return(last_page)
 
 def filter_by_id_info(id):
     cursor = db.gasolineras.find(

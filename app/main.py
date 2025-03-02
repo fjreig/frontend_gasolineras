@@ -6,7 +6,7 @@ from datetime import datetime
 from fh_altair import altair_headers
 import pandas as pd
 
-from app.models import add_gasolineras, get_all_tasks, filter_by_municipio, filter_by_id, filter_by_id_info, filter_by_municipio_all
+from app.models import add_gasolineras, get_all_tasks, filter_by_municipio, filter_by_id, filter_by_id_info, filter_by_municipio_all, get_last_page
 from app.lista import consultar_datos
 from app.gasolineras import ObtenerPrecio
 from app.dashboard import generate_chart_Gasoil, generate_chart_Gasolina95
@@ -38,7 +38,7 @@ class New_Element:
     habilitado: bool
 
 current_page = 0
-current_municipio = "" 
+current_municipio = ""
 
 @rt('/')
 def index():
@@ -109,6 +109,13 @@ def post(FiltroMunicipio:str):
 def post():
     global current_page
     current_page = 0
+    return Redirect(f"/")
+
+@app.post('/last_page')
+def post():
+    last_page = get_last_page()
+    global current_page
+    current_page = last_page
     return Redirect(f"/")
 
 @app.post('/next_page')
