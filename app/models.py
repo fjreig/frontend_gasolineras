@@ -62,11 +62,11 @@ def filter_by_id(id):
     return(valores)
 
 def filter_by_municipio_all(Municipio):
-    cursor = db.gasolineras.find(
-        filter={'Municipio': Municipio},
-        projection={},
-        collation={},
-        )
+    pipeline = [   
+        {'$addFields': {'fecha_string': {'$dateToString': {'format': '%Y-%m-%d', 'date': '$Fecha'}}}}, 
+        {'$match': {'fecha_string': '2025-03-02', 'Municipio': Municipio} }
+        ]
+    cursor = db.gasolineras.aggregate(pipeline)
     valores = list(cursor)
     return(valores)
 

@@ -67,7 +67,7 @@ def generarGrafica_MAP_Gasolina(df):
 
 def generarGrafica_Gasolina(df):
     df = df[df['Precio Gasolina 95 E5'].notna()]
-    fig = px.bar(df, x='Rótulo', y='Precio Gasolina 95 E5')
+    fig = px.bar(df, x='IDEESS', y='Precio Gasolina 95 E5')
     fig.update_layout(
         autosize=True,
         margin=dict(l=20, r=20, t=20, b=20), hovermode='x unified',

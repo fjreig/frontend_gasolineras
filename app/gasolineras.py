@@ -15,11 +15,13 @@ def ObtenerPrecio():
     df2 = pd.json_normalize(df['ListaEESSPrecio'])
     df2['Fecha'] = df['Fecha']
 
+    # Cambiar de Mayusculas a minusculas
     df2['Localidad'] = df2['Localidad'].str.lower()
     df2['Municipio'] = df2['Municipio'].str.lower()
     df2['Provincia'] = df2['Provincia'].str.lower()
     df2['Rótulo'] = df2['Rótulo'].str.lower()
 
+    # Cambiar de string a fomato float
     df2['Latitud'] = pd.to_numeric(df2['Latitud'].str.replace(',','.'))
     df2['Longitud (WGS84)'] = pd.to_numeric(df2['Longitud (WGS84)'].str.replace(',','.'))
     df2['Precio Gasoleo A'] = pd.to_numeric(df2['Precio Gasoleo A'].str.replace(',','.'))
@@ -35,6 +37,9 @@ def ObtenerPrecio():
     df2['Precio Bioetanol'] = pd.to_numeric(df2['Precio Bioetanol'].str.replace(',','.'))
     df2['Precio Gas Natural Licuado'] = pd.to_numeric(df2['Precio Gas Natural Licuado'].str.replace(',','.'))
     df2['Precio Gas Natural Comprimido'] = pd.to_numeric(df2['Precio Gas Natural Comprimido'].str.replace(',','.'))
+
+    # Cambiar de string a formato fecha
+    df2['Fecha'] = pd.to_datetime(df2['Fecha'], format='%d/%m/%Y %H:%M:%S')
 
     valores = df2.to_dict('records')
     return(valores)
