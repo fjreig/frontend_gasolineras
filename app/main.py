@@ -7,6 +7,14 @@ from datetime import datetime
 from app.models import add_gasolineras, get_all_tasks, filter_by_municipio, filter_by_id
 from app.lista import consultar_datos
 from app.gasolineras import ObtenerPrecio
+from app.dashboard import generate_chart_Gasoil, generate_chart_Gasolina95
+from app.info import (
+    Info_ubicacion_Gasolinera, 
+    Info_precios_carburante, 
+    Info_Horario, 
+    Info_ubicacion_Gasolinera_Codigos,
+    Info_map
+)
 
 hdrs = (Theme.green.headers())
 app, rt = fast_app(hdrs=hdrs)
@@ -33,12 +41,38 @@ def index():
         (num_filas, data) = filter_by_municipio(current_municipio, current_page)
     return consultar_datos(num_filas, data, current_page)
 
-@rt('/informacion/{valor}')
-def index(valor):
-    return Title("Count Demo"), Main(
-        H1("Count Demo"),
-        P(valor, id="count"),
-    )
+@rt('/informacion/{id}')
+def index(id: str):
+    df_gasolinerra = filter_by_id(id)
+    print(df_gasolinerra)
+    return Title("Info Gasolinera"),Container(
+        H2(f'Información gasolinera {id}'),
+        DivRAligned(
+                Button("Volver", cls=ButtonT.destructive, hx_post="/return",),
+            ),
+        Grid(*map(Div,(
+                      Div(Info_ubicacion_Gasolinera(df_gasolinerra), Info_ubicacion_Gasolinera_Codigos(df_gasolinerra), cls='space-y-4'),
+                      Div(Info_precios_carburante(df_gasolinerra), cls='space-y-4'),
+                      Div(Info_Horario(df_gasolinerra), Info_map(df_gasolinerra), cls='space-y-4'))),
+         cols_md=1, cols_lg=2, cols_xl=3))
+
+@rt('/graficas/{id}')
+def index(id: str):
+    df_gasolinerra = filter_by_id(id)
+    print(df_gasolinerra)
+    return Title("Historicos"), Container(
+        H2('Graficos'),
+        DivRAligned(
+                Button("Refrescar", cls=ButtonT.primary, hx_post="/graficas",),
+                Button("Volver", cls=ButtonT.destructive, hx_post="/return",),
+            ),
+        #Generar_Cards(df_inversor),
+        Grid(
+            Card(Safe(generate_chart_Gasoil(df_gasolinerra)), cls='col-span-2'),
+            Card(Safe(generate_chart_Gasolina95(df_gasolinerra)), cls='col-span-2'),
+            gap=2,cols_xl=7,cols_lg=7,cols_md=1,cols_sm=1,cols_xs=1),
+        cls=('space-y-4', ContainerT.xl)
+        )
 
 @app.post('/filtrar_municipio')
 def post(FiltroMunicipio:str):
@@ -70,9 +104,20 @@ def post():
     return Redirect(f"/")
 
 @rt('/info/{gasolinera}')
-def info_gasolinera(gasolinera):
+def info_gasolinera(gasolinera: str):
     valor = filter_by_id(gasolinera)
-    return Redirect(f"/informacion/{valor}")
+    gasolinera_info = valor['IDEESS']
+    return Redirect(f"/informacion/{gasolinera_info}")
+
+@rt('/charts/{gasolinera}')
+def info_gasolinera(gasolinera: str):
+    valor = filter_by_id(gasolinera)
+    gasolinera_info = valor['IDEESS']
+    return Redirect(f"/graficas/{gasolinera_info}")
+
+@rt('/return')
+def info_gasolinera():
+    return Redirect(f"/")
 
 @rt('/gasolineras')
 def post():

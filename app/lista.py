@@ -50,7 +50,7 @@ def acciones_row(valor_id):
     return Div(DivLAligned(
                 UkIconLink(icon='info', button=True, hx_get=f"/info/{valor_id}"),
                 UkIconLink(icon='map', button=True, hx_get=f"/map/{valor_id}"), 
-                UkIconLink(icon='chart-spline', button=True, hx_get=f"/historico/{valor_id}"),
+                UkIconLink(icon='chart-spline', button=True, hx_get=f"/charts/{valor_id}"),
             )
         )
 

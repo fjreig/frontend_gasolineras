@@ -6,3 +6,5 @@ fastsql
 pandas
 MonsterUI
 pymongo
+plotly
+fh-plotly

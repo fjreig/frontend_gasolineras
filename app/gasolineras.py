@@ -4,10 +4,10 @@ import ast
 
 def ObtenerPrecio():
     file_name = 'app/out.csv'
-    #with urllib.request.urlopen("https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/") as url, open(file_name, 'wb') as out_file:
-    #    data = json.load(url)
-    #    df = pd.DataFrame.from_dict(data)
-    #    df.to_csv(file_name, index=False)  
+    with urllib.request.urlopen("https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/") as url, open(file_name, 'wb') as out_file:
+        data = json.load(url)
+        df = pd.DataFrame.from_dict(data)
+        df.to_csv(file_name, index=False)  
 
     df = pd.read_csv(file_name)
 

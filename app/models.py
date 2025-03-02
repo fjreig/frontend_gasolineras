@@ -48,7 +48,7 @@ def filter_by_id(id):
         collation={},
         )
     valores = list(cursor)
-    return(valores)
+    return(valores[0])
 
 def BuscarProvincias():
     cursor = db.gasolineras.distinct('Provincia')
