@@ -110,13 +110,16 @@ def consultar_datos(num_row, data, current_page: int):
         )
 
     table_controls =(
-        DivLAligned(
-            Form(DivLAligned(
-                Input(cls='w-[250px]',placeholder='Filtro por Municipio',name='FiltroMunicipio'),
-                Button("Buscar",cls=(ButtonT.primary, TextPresets.bold_sm), hx_post="/filtrar_municipio")
-            )),
-            Button('Filtro',cls=(ButtonT.primary, TextPresets.bold_sm), data_uk_toggle="target: #FiltroForm"),
-            Button('Download',cls=(ButtonT.primary, TextPresets.bold_sm), hx_post="/gasolineras")
+        DivLAligned( 
+                Form(
+                    Input(cls='w-[250px]',placeholder='Filtro por Municipio',name='FiltroMunicipio'),
+                    Button("Buscar",cls=(ButtonT.primary, TextPresets.bold_sm), hx_post="/filtrar_municipio")
+                ),
+            ),
+            DivRAligned(
+                Button('Filtro',cls=(ButtonT.primary, TextPresets.bold_sm), data_uk_toggle="target: #FiltroForm"),
+                Button('Analitica',cls=(ButtonT.primary, TextPresets.bold_sm), hx_post="/analitica"),
+                Button('Download',cls=(ButtonT.primary, TextPresets.bold_sm), hx_post="/gasolineras")
             )
         )
 
@@ -130,5 +133,5 @@ def consultar_datos(num_row, data, current_page: int):
             sortable=True,
             cls=(TableT.responsive, TableT.sm, TableT.divider)))
 
-    tasks_ui = Div(DivFullySpaced(DivLAligned(table_controls), cls='mt-8'), tasks_table, footer(num_row, current_page, total_pages))
+    tasks_ui = Div(DivFullySpaced(table_controls, cls='mt-8'), tasks_table, footer(num_row, current_page, total_pages))
     return(Container(page_heading, tasks_ui, CreateTaskModal()))

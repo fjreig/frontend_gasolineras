@@ -6,7 +6,17 @@ from datetime import datetime
 from fh_altair import altair_headers
 import pandas as pd
 
-from app.models import add_gasolineras, get_all_tasks, filter_by_municipio, filter_by_id, filter_by_id_info, filter_by_municipio_all, get_last_page
+from app.models import (
+    add_gasolineras, 
+    get_all_tasks, 
+    filter_by_municipio, 
+    filter_by_id, 
+    filter_by_id_info, 
+    filter_by_municipio_all, 
+    get_last_page,
+    avg_by_provincias
+)
+
 from app.lista import consultar_datos
 from app.gasolineras import ObtenerPrecio
 from app.dashboard import generate_chart_Gasoil, generate_chart_Gasolina95
@@ -23,6 +33,10 @@ from app.info_Municipio import (
     generarGrafica_MAP_Gasoil,
     generarGrafica_MAP_Gasolina,
     generarGrafica_Gasolina
+)
+
+from app.analitica import(
+    Tabla_comparativa
 )
 
 hdrs = (Theme.green.headers(), altair_headers)
@@ -52,30 +66,30 @@ def index():
 
 @rt('/informacion/{id}')
 def index(id: str):
-    df_gasolinerra = filter_by_id_info(id)
+    df_gasolinera = filter_by_id_info(id)
     return Title("Info Gasolinera"), Container(
         H2(f'Info Gasolinera {id}'),
         DivRAligned(
             Button("Volver", cls=ButtonT.destructive, hx_post="/return"),
         ),
         Grid(*map(Div,(
-            Div(Info_ubicacion_Gasolinera(df_gasolinerra), Info_ubicacion_Gasolinera_Codigos(df_gasolinerra), cls='space-y-4'),
-            Div(Info_Horario(df_gasolinerra), Info_precios_carburante(df_gasolinerra), cls='space-y-4'),
-            Div(Info_Rotulo(df_gasolinerra), Info_map(df_gasolinerra), cls='space-y-4'))),
+            Div(Info_ubicacion_Gasolinera(df_gasolinera), Info_ubicacion_Gasolinera_Codigos(df_gasolinera), cls='space-y-4'),
+            Div(Info_Horario(df_gasolinera), Info_precios_carburante(df_gasolinera), cls='space-y-4'),
+            Div(Info_Rotulo(df_gasolinera), Info_map(df_gasolinera), cls='space-y-4'))),
          cols_md=1, cols_lg=2, cols_xl=3),
         cls=('space-y-4', ContainerT.xl))
 
 @rt('/graficas/{id}')
 def index(id: str):
-    df_gasolinerra = filter_by_id(id)
+    df_gasolinera = filter_by_id(id)
     return Title("Historicos"), Container(
         H2('Graficos'),
         DivRAligned(
             Button("Volver", cls=ButtonT.destructive, hx_post="/return"),
         ),
         Grid(
-            Card(Safe(generate_chart_Gasoil(df_gasolinerra)), cls='col-span-3'),
-            Card(Safe(generate_chart_Gasolina95(df_gasolinerra)), cls='col-span-3'),
+            Card(Safe(generate_chart_Gasoil(df_gasolinera)), cls='col-span-3'),
+            Card(Safe(generate_chart_Gasolina95(df_gasolinera)), cls='col-span-3'),
             gap=2, cols_xl=6, cols_lg=6, cols_md=1, cols_sm=1, cols_xs=1),
         cls=('space-y-4', ContainerT.xl)
         )
@@ -96,6 +110,19 @@ def index(municipio: str):
             gap=2, cols_xl=6, cols_lg=6, cols_md=1, cols_sm=1, cols_xs=1),
         cls=('space-y-4', ContainerT.xl)
         )
+
+@rt('/info_analitica')
+def index():
+    valores = avg_by_provincias()
+    return Title("Analitica"), Container(
+        H2(f'Analitica:'),
+        DivRAligned(
+            Button("Volver", cls=ButtonT.destructive, hx_post="/return"),
+        ),
+        Grid(*map(Div,(
+            Div(Tabla_comparativa(valores), cls='space-y-4'))),
+         cols_md=1, cols_lg=2, cols_xl=3),
+        cls=('space-y-4', ContainerT.xl))
 
 @app.post('/filtrar_municipio')
 def post(FiltroMunicipio:str):
@@ -148,6 +175,10 @@ def info_gasolinera(gasolinera: str):
 @rt('/map/{municipio}')
 def info_gasolinera(municipio: str):
     return Redirect(f"/info_municipio/{municipio}")
+
+@rt('/analitica')
+def info_gasolinera():
+    return Redirect(f"/info_analitica")
 
 @rt('/return')
 def info_gasolinera():

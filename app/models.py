@@ -3,6 +3,7 @@ from fasthtml.common import *
 from bson.objectid import ObjectId
 import math
 import os
+import pandas as pd
 
 from app.database import db
 
@@ -80,6 +81,35 @@ def filter_by_municipio_all(Municipio):
     cursor = db.gasolineras.aggregate(pipeline)
     valores = list(cursor)
     return(valores)
+
+def avg_by_provincias():
+    pipeline1 =[
+        {'$addFields': {'fecha_string': {'$dateToString': {'format': '%Y-%m-%d', 'date': '$Fecha'}}}}, 
+        {'$match': {'fecha_string': '2025-03-03', 'Precio Gasoleo A': {'$gt': 0}}}, 
+        {'$project': {'Provincia': 1, 'Precio Gasoleo A': 1} }, 
+        {'$group': {'_id': '$Provincia', 'Gasoleo': {'$avg': '$Precio Gasoleo A'}}},
+        {'$project': {'Gasoleo': {'$round': ['$Gasoleo', 3]}}}
+    ]
+    pipeline2 = [
+        {'$addFields': {'fecha_string': {'$dateToString': {'format': '%Y-%m-%d', 'date': '$Fecha'}}}}, 
+        {'$match': {'fecha_string': '2025-03-03', 'Precio Gasolina 95 E5': {'$gt': 0}}}, 
+        {'$project': {'Provincia': 1, 'Precio Gasolina 95 E5': 1}}, 
+        {'$group': {'_id': '$Provincia', 'Gasolina': {'$avg': '$Precio Gasolina 95 E5'}}}, 
+        {'$project': {'Gasolina': {'$round': ['$Gasolina', 3]}}}
+    ]
+
+    cursor1= db.gasolineras.aggregate(pipeline1)
+    cursor2 = db.gasolineras.aggregate(pipeline2)
+    valores1 = list(cursor1)
+    valores2 = list(cursor2)
+    df1 = pd.DataFrame(valores1)
+    df2 = pd.DataFrame(valores2)
+    df1 = df1.set_index('_id')
+    df2 = df2.set_index('_id')
+    result = pd.concat([df1, df2], axis=1)
+    result = result.reset_index()
+    result = result.to_dict('records')
+    return(result)
 
 def BuscarProvincias():
     cursor = db.gasolineras.distinct('Provincia')
